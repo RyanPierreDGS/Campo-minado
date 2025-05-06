@@ -35,6 +35,7 @@ public class Tabuleiro {
 					coluna)
 					.findFirst()
 					.ifPresent(c -> c.abrir());	
+			
 		} catch(ExplosaoException e) {
 			campos.forEach(c -> c.setAberto(true));
 			throw e;
