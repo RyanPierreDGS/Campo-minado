@@ -1,13 +1,10 @@
 package br.com.cod3r.cm.modelo;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import br.com.cod3r.cm.excecao.ExplosaoException;
-
-public class Tabuleiro {
+public class Tabuleiro implements CampoObservador {
 	
 	private int quantidadeDeLinhas;
 	private int quantidadeDeColunas;
@@ -36,9 +33,8 @@ public class Tabuleiro {
 					.findFirst()
 					.ifPresent(c -> c.abrir());	
 			
-		} catch(ExplosaoException e) {
-			campos.forEach(c -> c.setAberto(true));
-			throw e;
+		} catch(Exception e) {
+			// FIXME Ajustar a implementação do metodo
 		}
 		
 	}
@@ -72,8 +68,10 @@ public class Tabuleiro {
 	private void gerarCampos() {
 		for(int i = 0; i < quantidadeDeLinhas; i++) {
 			for(int j = 0; j < quantidadeDeColunas; j++) {
-				campos.add(new Campo(quantidadeDeLinhas,
-						quantidadeDeColunas));
+				Campo campo = 
+						new Campo(quantidadeDeLinhas, quantidadeDeColunas);
+					campo.registrarObservador(this);
+					campos.add(campo);
 			}
 		}
 	}
@@ -87,32 +85,11 @@ public class Tabuleiro {
 		sortearMinas();
 	}
 	
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append(" ");
-		for(int c = 0; c < quantidadeDeColunas; c++) {
-			sb.append(" ");
-			sb.append(c);
-			sb.append(" ");
+	public void eventoOcorreu(Campo campo, CampoEvento evento) {
+		if(evento == CampoEvento.EXPLODIR) {
+			System.out.println("Perdeu.....");
+		} else if(objetivoAlcancado()) {
+			System.out.println("Ganhou....");
 		}
-		sb.append("\n");
-		
-		
-		
-		int i = 0;
-		for(int l = 0; l < quantidadeDeLinhas; l++) {
-			sb.append(l);
-			sb.append(" ");
-			for(int c = 0; c < quantidadeDeColunas; c++) {
-				sb.append(" ");
-				sb.append(campos.get(i));
-				sb.append(" ");
-				i++;
-			}
-			sb.append("\n");
-		}
-		
-		return sb.toString();
 	}
 }
