@@ -71,25 +71,25 @@ public class Tabuleiro implements CampoObservador {
 		} while(minasArmadas < quantidadeDeMinas);
 	}
 	
-	// Criar 2 forEach para percorrer a lista campos e relacionar os vizinhos
-	private void associarOsVizinhos() {
-		for(Campo c1: campos) {
-			for(Campo c2: campos) {
-				c1.adicionarVizinho(c2);
-			}
-		}
-	}
-	
 	private void gerarCampos() {
 		for(int i = 0; i < quantidadeDeLinhas; i++) {
 			for(int j = 0; j < quantidadeDeColunas; j++) {
 				Campo campo = 
-						new Campo(quantidadeDeLinhas, quantidadeDeColunas);
+						new Campo(i, j); // Estava dando erro... precisou ser alterado de quantidadeDeLinhas para i e mesma coisa pra colunas..
 					campo.registrarObservador(this);
 					campos.add(campo);
 			}
 		}
 	}
+	
+	// Criar 2 forEach para percorrer a lista campos e relacionar os vizinhos
+		private void associarOsVizinhos() {
+			for(Campo c1: campos) {
+				for(Campo c2: campos) {
+					c1.adicionarVizinho(c2);
+				}
+			}
+		}
 	
 	public boolean objetivoAlcancado() {
 		return campos.stream().allMatch(c -> c.objetivoAlcancado());
