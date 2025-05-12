@@ -2,15 +2,18 @@ package br.com.cod3r.cm.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class Tabuleiro implements CampoObservador {
 	
-	private int quantidadeDeLinhas;
-	private int quantidadeDeColunas;
-	private int quantidadeDeMinas;
+	private final int quantidadeDeLinhas;
+	private final int quantidadeDeColunas;
+	private final int quantidadeDeMinas;
 	
 	private final List<Campo> campos = new ArrayList<>();
+	private final List<Consumer<Boolean>> observadores = 
+			new ArrayList<>();
 	
 	//Instanciando um construtor com os parametros acima
 	public Tabuleiro(int quantidadeDeLinhas, 
@@ -23,20 +26,32 @@ public class Tabuleiro implements CampoObservador {
 		sortearMinas();
 	}
 	
+	public void paraCada(Consumer<Campo> funcao) {
+		campos.forEach(funcao);
+	}
+	
+	public void registrarObservador(Consumer<Boolean> observador) {
+		observadores.add(observador);
+	}
+	
+	private void notificarObservador(boolean resultado) {
+		observadores.stream()
+			.forEach(o -> o.accept(resultado));
+	}
+	
 	public void abrir(int linha, int coluna) {
 		
-		try {
-			campos.parallelStream()
-					.filter(c -> c.getLinha() 
-					== linha && c.getColuna() == 
-					coluna)
-					.findFirst()
-					.ifPresent(c -> c.abrir());	
-			
-		} catch(Exception e) {
-			// FIXME Ajustar a implementação do metodo
-		}
-		
+		campos.parallelStream()
+				.filter(c -> c.getLinha() 
+				== linha && c.getColuna() == 
+				coluna)
+				.findFirst()
+				.ifPresent(c -> c.abrir());	
+	}
+	
+	private void mostrarMinas() {		
+		campos.stream().filter(c -> c.isMinado())
+		.forEach(c -> c.setAberto(true));
 	}
 	
 	public void alternarMarcacao(int linha, int coluna) {
@@ -85,11 +100,22 @@ public class Tabuleiro implements CampoObservador {
 		sortearMinas();
 	}
 	
+	
+	public int getQuantidadeDeLinhas() {
+		return quantidadeDeLinhas;
+	}
+
+	public int getQuantidadeDeColunas() {
+		return quantidadeDeColunas;
+	}
+
 	public void eventoOcorreu(Campo campo, CampoEvento evento) {
 		if(evento == CampoEvento.EXPLODIR) {
-			System.out.println("Perdeu.....");
+			mostrarMinas();
+			notificarObservador(false);
 		} else if(objetivoAlcancado()) {
 			System.out.println("Ganhou....");
+			notificarObservador(true);
 		}
 	}
 }
