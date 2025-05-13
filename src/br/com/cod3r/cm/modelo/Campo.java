@@ -83,9 +83,6 @@ public class Campo {
 			
 			setAberto(true);
 
-			System.out.println("Abrindo campo [" + linha + "," + coluna + "]");
-	        System.out.println("Tem " + vizinhos.size() + " vizinhos");
-			
 			if(vizinhancaSegura()) {
 			vizinhos.forEach(v -> v.abrir());	
 			}
@@ -152,6 +149,9 @@ public class Campo {
 	void reiniciar() {
 		aberto = false;
 		minado = false;
+		marcado = false;
+		
+		notificarObservadores(CampoEvento.REINICIAR);
 	}
 
 }

@@ -2,7 +2,9 @@ package br.com.cod3r.cm.visao;
 
 import java.awt.GridLayout;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import br.com.cod3r.cm.modelo.Tabuleiro;
 
@@ -16,10 +18,17 @@ public class PainelTabuleiro extends JPanel {
 				tabuleiro.getQuantidadeDeColunas()));
 		
 		tabuleiro.paraCada(c -> add(new BotaoCampo(c)));
-		
 		tabuleiro.registrarObservador(e -> {
-			// TODO Mostrar resultado fazer depois
+			SwingUtilities.invokeLater(() -> {
+				if(e.isGanhou()) {
+					JOptionPane.showMessageDialog(this, "ganhou");
+				} else {
+					JOptionPane.showMessageDialog(this, "perdeu");
+				}
+				tabuleiro.reiniciar();
+			});	
 		});
+		
 	}
 	
 }
